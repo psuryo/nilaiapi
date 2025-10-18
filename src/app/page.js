@@ -1,103 +1,138 @@
-import Image from "next/image";
+'use client';
+import React, { useState, useCallback } from 'react';
 
-export default function Home() {
+// --- YOUR DATA FORMAT ---
+const mockGradesData = [
+  { idnumber: '2024001', kriteria: 'K1', judulkriteria: 'Attendance & Participation', grade: '95' },
+  { idnumber: '2024001', kriteria: 'K2', judulkriteria: 'Midterm Report', grade: '91' },
+  { idnumber: '2024001', kriteria: 'K3', judulkriteria: 'Group Project Score', grade: '88' },
+  { idnumber: '2024001', kriteria: 'K4', judulkriteria: 'Final Exam Result', grade: '93' },
+
+  { idnumber: '2024002', kriteria: 'K1', judulkriteria: 'Attendance & Participation', grade: '84' },
+  { idnumber: '2024002', kriteria: 'K2', judulkriteria: 'Midterm Report', grade: '90' },
+  { idnumber: '2024002', kriteria: 'K3', judulkriteria: 'Group Project Score', grade: '86' },
+  { idnumber: '2024002', kriteria: 'K4', judulkriteria: 'Final Exam Result', grade: '81' },
+];
+
+// --- COLOR FUNCTION ---
+const getGradeColor = (gradeString) => {
+  const grade = parseFloat(gradeString);
+  if (isNaN(grade)) return 'bg-gray-100 text-gray-700 border-gray-300';
+  if (grade >= 90) return 'bg-green-100 text-green-700 border-green-300';
+  if (grade >= 80) return 'bg-blue-100 text-blue-700 border-blue-300';
+  if (grade >= 70) return 'bg-yellow-100 text-yellow-700 border-yellow-300';
+  return 'bg-red-100 text-red-700 border-red-300';
+};
+
+const GradeViewerPage = () => {
+  const [studentId, setStudentId] = useState('');
+  const [grades, setGrades] = useState(null);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSearch = useCallback((e) => {
+    e.preventDefault();
+    setError('');
+    setGrades(null);
+    setIsLoading(true);
+
+    setTimeout(() => {
+      const foundGrades = mockGradesData.filter(
+        (record) => record.idnumber === studentId.trim()
+      );
+
+      if (foundGrades.length === 0) {
+        setError(`Student ID "${studentId}" not found.`);
+        setIsLoading(false);
+        return;
+      }
+
+      setGrades(foundGrades);
+      setIsLoading(false);
+    }, 800);
+  }, [studentId]);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center p-4 sm:p-8 font-inter">
+      <div className="w-full max-w-2xl bg-white shadow-xl rounded-2xl p-6 sm:p-10 border border-gray-100">
+        
+        <header className="text-center mb-8">
+          <h1 className="text-3xl font-extrabold text-indigo-700 tracking-tight sm:text-4xl">
+            Student Grade Retrieval Portal
+          </h1>
+          <p className="mt-2 text-lg text-gray-500">
+            Enter your 7-digit ID number to view your detailed assessment results.
+          </p>
+        </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4 mb-8">
+          <input
+            type="text"
+            value={studentId}
+            onChange={(e) => setStudentId(e.target.value)}
+            placeholder="e.g., 2024001"
+            className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-lg shadow-sm"
+            required
+          />
+          <button
+            type="submit"
+            disabled={isLoading || studentId.trim().length === 0}
+            className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 disabled:bg-indigo-300 flex items-center justify-center text-lg"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            {isLoading ? (
+              <svg className="animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : 'Search Grades'}
+          </button>
+        </form>
+
+        <div className="min-h-[150px]">
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-300 text-red-700 rounded-lg text-center font-medium">
+              {error}
+            </div>
+          )}
+
+          {grades && (
+            <div className="mt-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Results for ID: <span className="text-indigo-600">{studentId}</span>
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {grades.map((item, index) => (
+                  <div 
+                    key={index} 
+                    className="flex flex-col p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition duration-150"
+                  >
+                    <p className="text-sm font-medium text-gray-500 mb-1 uppercase tracking-wider">
+                      {item.judulkriteria}
+                    </p>
+                    <div className="text-3xl font-extrabold flex items-center">
+                      <span 
+                        className={`inline-block px-3 py-1 rounded-full border-2 font-mono ${getGradeColor(item.grade)}`}
+                      >
+                        {item.grade}%
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!isLoading && !grades && !error && (
+            <div className="p-6 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
+              <p className="text-lg">Please enter a student ID and click search to view results.</p>
+            </div>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+      </div>
     </div>
   );
-}
+};
+
+export default GradeViewerPage;
