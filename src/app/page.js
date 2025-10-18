@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Image from 'next/image';
 
 const GradeViewerPage = () => {
   const [password, setPassword] = useState('');
@@ -41,7 +42,7 @@ const GradeViewerPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center p-8">
         <h1 className="text-3xl font-bold text-indigo-700 mb-6 text-center">
-          Hi, {user.nama} <br/>
+          Hi, {user.nama} <br />
           ({user.nrp})
         </h1>
 
@@ -72,6 +73,15 @@ const GradeViewerPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8">
+      <div className="text-center mb-8">
+        <Image
+          src="/logo.png" // <-- place your logo file in public/logo.png
+          alt="Informatics UKWMS Logo"
+          width={200}
+          height={200}
+          className="mx-auto mb-3"
+        />
+      </div>
       <form
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm"
