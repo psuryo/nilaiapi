@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
 
 const pool = new Pool({
-  user: 'nanang',
-  host: '172.20.48.43',          // or '127.0.0.1'
-  database: 'nilai',
-  password: 'Ukwms_2025',
+  user: process.env.PGUSER,
+  host: process.env.PGHOST,          // or '127.0.0.1'
+  database: process.env.PGDATABASE,
+  password: process.env.PGPASSWORD,
   port: 5432,                 // adjust if needed
+  ssl: false,                   // set to true if using SSL
 });
 
 export async function GET(request) {
@@ -19,7 +20,7 @@ export async function GET(request) {
 
   try {
     const result = await pool.query(
-      'SELECT kriteria, judulkriteria, grade FROM nilai WHERE nrp = $1',
+      'SELECT kriteria, judulkriteria, grade FROM nilai WHERE nrp = $1 order by idnilai asc',
       [id]
     );
 

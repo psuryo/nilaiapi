@@ -1,20 +1,7 @@
 'use client';
 import React, { useState, useCallback } from 'react';
 
-// --- YOUR DATA FORMAT ---
-const mockGradesData = [
-  { idnumber: '2024001', kriteria: 'K1', judulkriteria: 'Attendance & Participation', grade: '95' },
-  { idnumber: '2024001', kriteria: 'K2', judulkriteria: 'Midterm Report', grade: '91' },
-  { idnumber: '2024001', kriteria: 'K3', judulkriteria: 'Group Project Score', grade: '88' },
-  { idnumber: '2024001', kriteria: 'K4', judulkriteria: 'Final Exam Result', grade: '93' },
-
-  { idnumber: '2024002', kriteria: 'K1', judulkriteria: 'Attendance & Participation', grade: '84' },
-  { idnumber: '2024002', kriteria: 'K2', judulkriteria: 'Midterm Report', grade: '90' },
-  { idnumber: '2024002', kriteria: 'K3', judulkriteria: 'Group Project Score', grade: '86' },
-  { idnumber: '2024002', kriteria: 'K4', judulkriteria: 'Final Exam Result', grade: '81' },
-];
-
-// --- COLOR FUNCTION ---
+// --- COLOR FUNCTION (same as before) ---
 const getGradeColor = (gradeString) => {
   const grade = parseFloat(gradeString);
   if (isNaN(grade)) return 'bg-gray-100 text-gray-700 border-gray-300';
@@ -30,26 +17,28 @@ const GradeViewerPage = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSearch = useCallback((e) => {
+  // --- UPDATED: fetch data from your /api/grades route ---
+  const handleSearch = useCallback(async (e) => {
     e.preventDefault();
     setError('');
     setGrades(null);
     setIsLoading(true);
 
-    setTimeout(() => {
-      const foundGrades = mockGradesData.filter(
-        (record) => record.idnumber === studentId.trim()
-      );
+    try {
+      const res = await fetch(`/api/grades?id=${studentId.trim()}`);
+      const data = await res.json();
 
-      if (foundGrades.length === 0) {
-        setError(`Student ID "${studentId}" not found.`);
-        setIsLoading(false);
-        return;
+      if (!res.ok) {
+        setError(data.error || 'Unknown error');
+      } else {
+        setGrades(data);
       }
-
-      setGrades(foundGrades);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch data.');
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   }, [studentId]);
 
   return (
@@ -65,6 +54,7 @@ const GradeViewerPage = () => {
           </p>
         </header>
 
+        {/* --- Search Form --- */}
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4 mb-8">
           <input
             type="text"
@@ -73,6 +63,7 @@ const GradeViewerPage = () => {
             placeholder="e.g., 2024001"
             className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-lg shadow-sm"
             required
+            aria-label="Student ID Number"
           />
           <button
             type="submit"
@@ -88,6 +79,7 @@ const GradeViewerPage = () => {
           </button>
         </form>
 
+        {/* --- Results Display Area --- */}
         <div className="min-h-[150px]">
           {error && (
             <div className="p-4 bg-red-50 border border-red-300 text-red-700 rounded-lg text-center font-medium">
@@ -109,6 +101,9 @@ const GradeViewerPage = () => {
                   >
                     <p className="text-sm font-medium text-gray-500 mb-1 uppercase tracking-wider">
                       {item.judulkriteria}
+                    </p>
+                    <p className="text-sm font-medium text-gray-500 mb-1">
+                      {item.kriteria}
                     </p>
                     <div className="text-3xl font-extrabold flex items-center">
                       <span 
