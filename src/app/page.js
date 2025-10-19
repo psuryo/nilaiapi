@@ -54,7 +54,7 @@ const GradeViewerPage = () => {
             >
               <p className="text-gray-800 font-semibold">{item.judulkriteria}</p>
               <p className="text-gray-500 text-sm uppercase font-medium">{item.kriteria}</p>
-              <p className="text-2xl font-bold text-indigo-700">{item.grade}</p>
+              <p className="text-2xl font-bold text-indigo-700">{`${item.grade}/${item.bobot}`}</p>
             </div>
           ))}
           {/* --- Total section --- */}

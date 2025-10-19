@@ -30,7 +30,7 @@ export async function POST(request) {
     const user = userResult.rows[0];
 
     const gradesResult = await pool.query(
-      "SELECT kriteria, judulkriteria, grade FROM nilai WHERE nrp = $1 ORDER BY idnilai ASC",
+      "SELECT kriteria, judulkriteria, grade, bobot FROM nilai WHERE nrp = $1 ORDER BY idnilai ASC",
       [user.nrp]
     );
 
